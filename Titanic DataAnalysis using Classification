@@ -1,0 +1,70 @@
+# STEP 1:import all required libraries and load the data set***************************************
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+df_test=pd.read_csv('titanic_test.csv')
+df_train=pd.read_csv('titanic_train.csv')
+df_train.shape
+df_train.head()
+df_test.head()
+test_ids=df_test['PassengerId']
+
+#step 2: Drop the columns which are not useful for building the  model***************************************
+
+def droping(df):
+    df=df.drop(['PassengerId','Name','Ticket','Cabin'],axis=1)
+    return df
+df_train=droping(df_train)
+df_test=droping(df_test)
+df_train.head(5)
+
+#STEP 3: Dealing with missing values ****************************************
+
+print(df_train.isnull().sum())
+#fill missing values in training dataset
+#fill age attribute with median
+df_train['Age']=df_train['Age'].fillna(df_train['Age'].median())
+#fill Fare attribute with median
+df_train['Fare']=df_train['Fare'].fillna(df_train['Fare'].median())
+df_train['Embarked']=df_train['Embarked'].fillna('U')
+df_train.isnull().sum()
+# for testing data**************************************
+df_test['Age']=df_test['Age'].fillna(df_test['Age'].median())
+#fill Cabin attribute with most frequently repeated value
+#df_test['Cabin']=df_test['Cabin'].fillna(df_test['Cabin'].value_counts().index[1])
+#fill Fare attribute with median
+df_test['Fare']=df_test['Fare'].fillna(df_test['Fare'].median())
+df_test['Embarked']=df_test['Embarked'].fillna('U')
+df_test.isnull().sum()
+
+#STEP 4: PreProcessing the data to Deal with categorical data****************************************
+
+from sklearn.preprocessing import LabelEncoder
+en=LabelEncoder()
+cols=['Sex','Embarked']
+for col in cols:
+    df_train[col]=en.fit_transform(df_train[col])
+    df_test[col]=en.transform(df_test[col])
+df_train.head(5)
+
+#STEP 5:Train the model ***********************************
+
+#training the model
+y=df_train['Survived']
+X=df_train.drop('Survived',axis=1)
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state#=42)
+
+# STEP 6: Building the model ***************************
+
+from sklearn.linear_model import LogisticRegression
+clf=LogisticRegression(max_iter=1000)
+clf.fit(x_train,y_train)
+pred=clf.predict(x_test)
+
+#STEP 7: Evaluate the model by accuracy score*********************************
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test,pred)
+
