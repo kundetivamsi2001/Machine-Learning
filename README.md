@@ -1,4 +1,4 @@
-# Machine-Learning
+# Titanic Classification
 
 
 The titanic dataset is very popular, highly used in Machine Learning. It contains
